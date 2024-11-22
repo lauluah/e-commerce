@@ -4,12 +4,16 @@ import br.ada.ecommerce.model.Customer;
 import br.ada.ecommerce.usecases.INotifierUseCase;
 import br.ada.ecommerce.usecases.impl.customer.CustomerUseCaseImpl;
 import br.ada.ecommerce.usecases.repository.ICustomerRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class CustomerUserCaseImplTest {
@@ -21,17 +25,27 @@ public class CustomerUserCaseImplTest {
     private INotifierUseCase<Customer> notifier;
 
     @InjectMocks
-    private CustomerUseCaseImpl customerUseCase;
+    private CustomerUseCaseImpl useCase;
 
-    @BeforeEach
-    public void setUp() {
+    @Test
+    public void deletarClienteExistente_retornaCliente() {
         Customer customer = new Customer();
-        customerRepository = Mockito.mock(ICustomerRepository.class);
+        customer.setId(1L);
 
-        notifier = Mockito.mock(INotifierUseCase.class);
+        Mockito.when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
+        Customer deletedCustomer = useCase.delete(1L);
 
-        Mockito.when(customerRepository.findByDocument("dummy-value")).thenReturn(customer);
 
-        customerUseCase = new CustomerUseCaseImpl(customerRepository, notifier);
+        Assertions.assertNotNull(deletedCustomer);
+        Mockito.verify(customerRepository, Mockito.times(1)).delete(customer);
+        Mockito.verify(notifier, Mockito.times(1)).deleted(customer);
+        Assertions.assertEquals(1L, deletedCustomer.getId());
+    }
+
+    @Test
+    public void retornarNull_SeNaoEcontrarClientePorId() {
+        Mockito.when(customerRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        Customer result = useCase.delete(1L);
+        Assertions.assertNull(result);
     }
 }
