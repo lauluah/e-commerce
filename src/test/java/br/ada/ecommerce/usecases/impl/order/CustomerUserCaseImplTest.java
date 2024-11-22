@@ -5,15 +5,23 @@ import br.ada.ecommerce.usecases.INotifierUseCase;
 import br.ada.ecommerce.usecases.impl.customer.CustomerUseCaseImpl;
 import br.ada.ecommerce.usecases.repository.ICustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 public class CustomerUserCaseImplTest {
 
+    @Mock
     private ICustomerRepository customerRepository;
+
+    @Mock
     private INotifierUseCase<Customer> notifier;
 
+    @InjectMocks
     private CustomerUseCaseImpl customerUseCase;
-    private Customer customer;
 
     @BeforeEach
     public void setUp() {
